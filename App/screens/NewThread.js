@@ -15,6 +15,7 @@ export default ({ navigation }) => {
         name: threadName,
         latestMessage: {
           text: `${threadName} has been created`,
+          createdAt: new Date().getTime(),
         },
       })
       .then(() => navigation.pop())

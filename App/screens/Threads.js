@@ -9,6 +9,7 @@ export default ({ navigation }) => {
   useEffect(() => {
     const unsubscribe = firestore()
       .collection('MESSAGE_THREADS')
+      .orderBy('latestMessage.createdAt', 'desc')
       .onSnapshot((querySnapshot) => {
         const allThreads = querySnapshot.docs.map((snapshot) => {
           return {

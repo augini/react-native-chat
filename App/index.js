@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
@@ -8,7 +8,6 @@ import Threads from './screens/Threads';
 import Messages from './screens/Messages';
 
 import { HeaderIcon } from './components/HeaderIcon';
-import { useState } from 'react';
 import Initializing from './screens/Initializing';
 
 const MessagingStack = createStackNavigator();

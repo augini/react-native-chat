@@ -1,13 +1,33 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { GiftedChat } from 'react-native-gifted-chat';
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+import { createMessage, currentUser, listenToMessages } from '../firebase';
 
 export default ({ route }) => {
   const [messages, setMessages] = useState([]);
   const thread = route?.params?.thread || {};
-  const user = auth().currentUser.toJSON();
+
+  useEffect(() => {
+    const unsubscribe = listenToMessages({ threadID: thread._id }).onSnapshot(
+      (querySnapshot) => {
+        const formattedMessages = querySnapshot.docs.map((doc) => {
+          return {
+            _id: doc.id,
+            text: '',
+            createdAt: new Date().getTime(),
+            user: {},
+            ...doc.data(),
+          };
+        });
+
+        setMessages(formattedMessages);
+      },
+    );
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   return (
     <View style={{ backgroundColor: '#fff', flex: 1 }}>
@@ -16,27 +36,9 @@ export default ({ route }) => {
         onSend={(message) => {
           setMessages(GiftedChat.append(messages, message));
           const text = message[0].text;
-
-          firestore()
-            .collection('MESSAGE_THREADS')
-            .doc(thread._id)
-            .set(
-              { latestMessage: { text, createdAt: new Date().getTime() } },
-              { merge: true },
-            )
-            .then(() => {
-              firestore()
-                .collection('MESSAGE_THREADS')
-                .doc(thread._id)
-                .collection('MESSAGES')
-                .add({
-                  text,
-                  createdAt: new Date().getTime(),
-                  user: { _id: user.uid, displayName: user.displayName },
-                });
-            });
+          createMessage({ threadID: thread._id, text });
         }}
-        user={{ _id: user.uid }}
+        user={{ _id: currentUser.uid }}
       />
     </View>
   );

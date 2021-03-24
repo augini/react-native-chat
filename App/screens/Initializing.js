@@ -1,11 +1,6 @@
 import { useEffect } from 'react';
 import auth from '@react-native-firebase/auth';
-import {
-  uniqueNamesGenerator,
-  adjectives,
-  animals,
-  colors,
-} from 'unique-names-generator';
+import { signInAnonymously } from '../firebase/index';
 
 export default ({ onHasUser }) => {
   useEffect(() => {
@@ -14,16 +9,7 @@ export default ({ onHasUser }) => {
         console.log({ authUser });
         return onHasUser();
       }
-      return auth()
-        .signInAnonymously()
-        .then(({ user }) => {
-          user.updateProfile({
-            displayName: uniqueNamesGenerator({
-              dictionaries: [adjectives, colors, animals],
-            }),
-          });
-        })
-        .then(() => onHasUser());
+      return signInAnonymously().then(() => onHasUser());
     });
 
     return () => unsubscribe();

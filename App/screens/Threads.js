@@ -1,27 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { FlatList, View } from 'react-native';
-import firestore from '@react-native-firebase/firestore';
+
 import { ThreadRow, Separator } from '../components/ThreadRow';
+import { listenToThreads } from '../firebase';
 
 export default ({ navigation }) => {
   const [threads, setThreads] = useState();
 
   useEffect(() => {
-    const unsubscribe = firestore()
-      .collection('MESSAGE_THREADS')
-      .orderBy('latestMessage.createdAt', 'desc')
-      .onSnapshot((querySnapshot) => {
-        const allThreads = querySnapshot.docs.map((snapshot) => {
-          return {
-            _id: snapshot.id,
-            name: '',
-            latestMessage: { text: '', createdAt: new Date().getTime() },
-            ...snapshot.data(),
-          };
-        });
-        console.log({ allThreads });
-        setThreads(allThreads);
+    const unsubscribe = listenToThreads().onSnapshot((querySnapshot) => {
+      const allThreads = querySnapshot.docs.map((snapshot) => {
+        return {
+          _id: snapshot.id,
+          name: '',
+          latestMessage: { text: '', createdAt: new Date().getTime() },
+          ...snapshot.data(),
+        };
       });
+      console.log({ allThreads });
+      setThreads(allThreads);
+    });
 
     return () => unsubscribe();
   }, []);

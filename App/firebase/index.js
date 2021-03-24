@@ -67,3 +67,14 @@ export const signInAnonymously = () => {
       });
     });
 };
+
+export const markThreadLastRead = ({ threadID }) => {
+  firestore()
+    .collection('USER_THREAD_TRACK')
+    .doc(currentUser.uid)
+    .set({ [threadID]: new Date().getTime() }, { merge: true });
+};
+
+export const listenToThreadTracking = () => {
+  return firestore().collection('USER_THREAD_TRACK').doc(currentUser.uid);
+};

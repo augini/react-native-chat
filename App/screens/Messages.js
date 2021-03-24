@@ -1,7 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { GiftedChat } from 'react-native-gifted-chat';
-import { createMessage, currentUser, listenToMessages } from '../firebase';
+import {
+  createMessage,
+  currentUser,
+  listenToMessages,
+  markThreadLastRead,
+} from '../firebase';
 
 export default ({ route }) => {
   const [messages, setMessages] = useState([]);
@@ -26,6 +31,7 @@ export default ({ route }) => {
 
     return () => {
       unsubscribe();
+      markThreadLastRead({ threadID: thread._id });
     };
   }, []);
 
